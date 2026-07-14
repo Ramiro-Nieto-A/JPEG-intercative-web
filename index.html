@@ -1,37 +1,74 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Compresión JPEG interactiva</title>
-  <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compresión JPEG - ITBA | ASSD</title>
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-  <header class="site-header">
-    <h1>Compresión JPEG interactiva</h1>
-    <p class="subtitle">Aprende el proceso completo</p>
-  </header>
-  <main id="app">
-    <section id="image-selector" class="panel">
-      <h2>Selecciona una muestra</h2>
-      <select id="sample-select"></select>
-    </section>
-    <section id="canvas-stage" class="panel">
-      <h2>Vista previa de la imagen</h2>
-      <canvas id="source-canvas" width="512" height="512"></canvas>
-      <canvas id="output-canvas" width="512" height="512"></canvas>
-    </section>
-    <section id="controls" class="panel">
-      <h2>Controles de compresión</h2>
-      <label for="quality-range">Calidad (Q) </label>
-      <input type="range" id="quality-range" min="1" max="100" value="80" />
-      <button id="compress-btn">Comprimir</button>
-    </section>
-    <section id="metrics" class="panel">
-      <h2>Métricas</h2>
-      <div id="metrics-output"></div>
-    </section>
-  </main>
-  <script src="js/main.js"></script>
+    <header class="main-header">
+        <div class="header-container">
+            <span class="brand">ITBA | <span class="highlight">ASSD</span></span>
+            <span class="subtitle">Laboratorio Interactivo: Transformadas y Compresión JPEG</span>
+        </div>
+    </header>
+
+    <main class="app-content">
+        <aside class="sidebar">
+            <div class="control-group">
+                <h3>Transformada</h3>
+                <select id="select-transform" class="custom-select">
+                    <option value="DCT">DCT-II Ortonormal</option>
+                    <option value="WHT">Transformada de Hadamard (WHT)</option>
+                </select>
+            </div>
+            
+            <div class="control-group info-box">
+                <p><strong>Materia:</strong> Análisis de Señales y Sistemas Digitales</p>
+                <p><strong>Trabajo:</strong> Compresión tipo JPEG</p>
+            </div>
+        </aside>
+
+        <section class="workspace">
+            <article class="card">
+                <h2>Funciones Base (8x8)</h2>
+                <div class="canvas-container">
+                    <canvas id="canvas-bases" width="400" height="400"></canvas>
+                </div>
+                <p class="caption">Representación del dominio frecuencial. Alterna entre DCT y Hadamard en el panel lateral.</p>
+            </article>
+
+            <article class="card">
+                <h2>Análisis Numérico de Bloque</h2>
+                <div class="grid-layout">
+                    <div>
+                        <h3>Dominio Espacial (Luminancia)</h3>
+                        <div id="matrix-spatial" class="matrix-grid"></div>
+                    </div>
+                    <div>
+                        <h3>Dominio Frecuencial (Cuantizado)</h3>
+                        <div id="matrix-frequency" class="matrix-grid"></div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="card">
+                <h2>Codificación Entrópica</h2>
+                <div class="grid-layout">
+                    <div>
+                        <h3>Recorrido Zig-Zag</h3>
+                        <canvas id="canvas-zigzag" width="256" height="256"></canvas>
+                    </div>
+                    <div>
+                        <h3>Flujo de Símbolos (RLE)</h3>
+                        <pre id="rle-stream-output" class="terminal"></pre>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <script type="module" src="./js/main.js"></script>
 </body>
 </html>
