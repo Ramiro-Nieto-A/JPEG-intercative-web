@@ -17,6 +17,11 @@
     <main class="app-content">
         <aside class="sidebar">
             <div class="control-group">
+                <h3>Cargar Imagen</h3>
+                <input type="file" id="image-loader" accept="image/*" class="custom-file-input">
+            </div>
+
+            <div class="control-group">
                 <h3>Transformada</h3>
                 <select id="select-transform" class="custom-select">
                     <option value="DCT">DCT-II Ortonormal</option>
@@ -32,15 +37,23 @@
 
         <section class="workspace">
             <article class="card">
+                <h2>Imagen Original</h2>
+                <div class="canvas-container">
+                    <canvas id="canvas-original" width="400" height="400"></canvas>
+                </div>
+                <p class="caption">Haz clic en cualquier parte de la imagen para aislar y analizar un bloque de 8x8 píxeles.</p>
+            </article>
+
+            <article class="card">
                 <h2>Funciones Base (8x8)</h2>
                 <div class="canvas-container">
                     <canvas id="canvas-bases" width="400" height="400"></canvas>
                 </div>
-                <p class="caption">Representación del dominio frecuencial. Alterna entre DCT y Hadamard en el panel lateral.</p>
+                <p class="caption">Representación del dominio frecuencial.</p>
             </article>
 
             <article class="card">
-                <h2>Análisis Numérico de Bloque</h2>
+                <h2>Análisis Numérico del Bloque Seleccionado</h2>
                 <div class="grid-layout">
                     <div>
                         <h3>Dominio Espacial (Luminancia)</h3>
