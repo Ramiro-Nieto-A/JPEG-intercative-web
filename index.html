@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang=" es\>
+<head>
+ <meta charset=\UTF-8\ />
+ <meta name=\viewport\ content=\width=device-width initial-scale=1.0\ />
+ <title>Compresión JPEG interactiva</title>
+ <link rel=\stylesheet\ href=\css/style.css\ />
+</head>
+<body>
+ <header class=\site-header\>
+ <h1>Compresión JPEG interactiva</h1>
+ <p class=\subtitle\>Aprende el proceso completo al estilo Apple</p>
+ </header>
+ <main id=\app\>
+ <section id=\image-selector\ class=\panel\>
+ <h2>Selecciona una muestra</h2>
+ <select id=\sample-select\></select>
+ </section>
+ <section id=\canvas-stage\ class=\panel\>
+ <h2>Vista previa de la imagen</h2>
+ <canvas id=\source-canvas\ width=512 height=512></canvas>
+ <canvas id=\output-canvas\ width=512 height=512></canvas>
+ </section>
+ <section id=\controls\ class=\panel\>
+ <h2>Controles de compresión</h2>
+ <label for=\quality-range\>Calidad (Q) </label>
+ <input type=\range\ id=\quality-range\ min=1 max=100 value=80 />
+ <button id=\compress-btn\>Comprimir</button>
+ </section>
+ <section id=\metrics\ class=\panel\>
+ <h2>Métricas</h2>
+ <div id=\metrics-output\></div>
+ </section>
+ </main>
+ <script src=\js/main.js\></script>
+</body>
+</html>
