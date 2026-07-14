@@ -17,20 +17,12 @@
     <main class="app-content">
         <aside class="sidebar">
             <div class="control-group">
-                <h3>Cargar Imagen</h3>
+                <h3>1. Cargar Imagen</h3>
                 <input type="file" id="image-loader" accept="image/*" class="custom-file-input">
             </div>
 
             <div class="control-group">
-                <h3>Submuestreo (Crominancia)</h3>
-                <select id="select-subsampling" class="custom-select">
-                    <option value="444">4:4:4 (Sin submuestreo)</option>
-                    <option value="420">4:2:0 (Decimación y Filtrado)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <h3>Motor de Transformada</h3>
+                <h3>2. Motor de Transformada</h3>
                 <select id="select-transform" class="custom-select">
                     <option value="DCT">DCT-II Ortonormal</option>
                     <option value="WHT">Walsh-Hadamard</option>
@@ -38,7 +30,7 @@
             </div>
 
             <div class="control-group">
-                <h3>Factor de Calidad (Q)</h3>
+                <h3>3. Factor de Calidad Global (Q)</h3>
                 <div class="slider-container">
                     <input type="range" id="slider-q" min="1" max="100" value="50" class="custom-slider">
                     <span id="q-value" class="slider-value">50</span>
@@ -53,27 +45,17 @@
             </div>
             
             <div class="control-group info-box">
-                <p><strong>Clasificación del Bloque:</strong> <span id="block-class-label">Plano</span></p>
-                <p>Haz clic en la imagen original para extraer y procesar un bloque de 8x8 real.</p>
+                <p><strong>Info del Bloque 8x8 Actual:</strong></p>
+                <p id="block-variance-label">Varianza: --</p>
+                <p id="block-class-label">Clasificación: --</p>
+                <p id="block-mult-label">Multiplicador Matriz: --</p>
             </div>
         </aside>
 
         <section class="workspace">
-            <div class="card pipeline-card">
-                <h2>Flujo de Procesamiento JPEG (Basado en Informe Final)</h2>
-                <div class="pipeline-steps">
-                    <div class="step">Color y Submuestreo</div>
-                    <div class="arrow">➔</div>
-                    <div class="step">DCT Adaptativa</div>
-                    <div class="arrow">➔</div>
-                    <div class="step">Cuantización</div>
-                    <div class="arrow">➔</div>
-                    <div class="step">RLE + Huffman</div>
-                </div>
-            </div>
-
             <article class="card">
-                <h2>Etapa 1: Espacio de Color y Submuestreo</h2>
+                <h2>Etapa 1: Espacio de Color y Análisis de Submuestreo 4:2:0</h2>
+                
                 <div class="grid-layout-4">
                     <div class="channel-box">
                         <h3>RGB Original</h3>
@@ -95,23 +77,36 @@
                         <div class="canvas-container"><canvas id="canvas-cr"></canvas></div>
                     </div>
                 </div>
+
+                <div class="subsampling-analysis" id="subsampling-panel" style="display: none;">
+                    <h3 style="margin-top: 20px; text-align: center; color: var(--primary-color);">Laboratorio de Submuestreo 4:2:0 sobre Crominancia Roja (Cr)</h3>
+                    <div class="grid-layout-5">
+                        <div class="channel-box">
+                            <h4>Cr Original</h4>
+                            <div class="canvas-container"><canvas id="cvs-cr-orig"></canvas></div>
+                        </div>
+                        <div class="channel-box">
+                            <h4>Decimación (Sin Anti-Alias)</h4>
+                            <div class="canvas-container"><canvas id="cvs-cr-dec-noaa"></canvas></div>
+                        </div>
+                        <div class="channel-box">
+                            <h4>Decimación (Con Filtro FIR)</h4>
+                            <div class="canvas-container"><canvas id="cvs-cr-dec-aa"></canvas></div>
+                        </div>
+                        <div class="channel-box">
+                            <h4>Recup. (Repetición / Cero Orden)</h4>
+                            <div class="canvas-container"><canvas id="cvs-cr-rec-noaa"></canvas></div>
+                        </div>
+                        <div class="channel-box">
+                            <h4>Recup. (Filtro Interpolador Bilineal)</h4>
+                            <div class="canvas-container"><canvas id="cvs-cr-rec-aa"></canvas></div>
+                        </div>
+                    </div>
+                </div>
             </article>
 
-            <div class="grid-layout-bases">
-                <article class="card">
-                    <h2>Funciones Base 8x8</h2>
-                    <div class="canvas-container">
-                        <canvas id="canvas-bases" width="280" height="280"></canvas>
-                    </div>
-                </article>
-                <article class="card inspector-card">
-                    <h2>Inspector de Datos (Pasa el mouse)</h2>
-                    <p id="hover-info" class="hover-text">Interactúa con las matrices inferiores para ver la explicación teórica de cada coeficiente.</p>
-                </article>
-            </div>
-
             <article class="card">
-                <h2>Etapa 2 y 3: Procesamiento del Bloque Seleccionado</h2>
+                <h2>Etapa 2 y 3: Procesamiento del Bloque 8x8 (Haz clic en la imagen original)</h2>
                 <div class="matrices-container">
                     <div class="matrix-column">
                         <h3>1. Dominio Espacial (Píxeles)</h3>
@@ -119,8 +114,8 @@
                         <div id="matrix-spatial" class="matrix-grid"></div>
                     </div>
                     <div class="matrix-column">
-                        <h3>2. Matriz de Cuantización</h3>
-                        <div class="spacer-text">Ajustada por Q y Filtro Adaptativo</div>
+                        <h3>2. Matriz de Cuantización Adaptativa</h3>
+                        <div class="spacer-text">Ajustada por Q y Varianza del Bloque</div>
                         <div id="matrix-quantization" class="matrix-grid"></div>
                     </div>
                     <div class="matrix-column">
@@ -132,31 +127,45 @@
             </article>
 
             <article class="card">
-                <h2>Etapa 4: Codificación Entrópica (Huffman y RLE) y Métricas</h2>
+                <h2>Etapa 4: Codificación Entrópica (RLE y Huffman)</h2>
                 <div class="grid-layout-3">
                     <div>
                         <h3>Vectorización Zig-Zag</h3>
-                        <div class="canvas-container">
+                        <div class="canvas-container" style="height: 250px;">
                             <canvas id="canvas-zigzag" width="200" height="200"></canvas>
                         </div>
                     </div>
                     <div>
-                        <h3>Flujo Binario (Huffman Simulado)</h3>
-                        <pre id="rle-stream-output" class="terminal"></pre>
+                        <h3>Construcción del Diccionario de Huffman</h3>
+                        <div class="huffman-table-container">
+                            <table class="huffman-table">
+                                <thead>
+                                    <tr>
+                                        <th>Símbolo RLE</th>
+                                        <th>Apariciones</th>
+                                        <th>Probabilidad</th>
+                                        <th>Código Binario</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="huffman-tbody">
+                                    <tr><td colspan="4">Selecciona un bloque...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="metrics-dashboard">
-                        <h3>Desempeño del Bloque</h3>
+                        <h3>Flujo Final y Desempeño</h3>
                         <div class="metric-box">
-                            <span class="metric-title">Error (MSE)</span>
+                            <span class="metric-title">Flujo Binario (Huffman)</span>
+                            <div id="huffman-stream" class="binary-stream">--</div>
+                        </div>
+                        <div class="metric-box">
+                            <span class="metric-title">Error Cuadrático (MSE)</span>
                             <span class="metric-value" id="metric-mse">--</span>
                         </div>
                         <div class="metric-box">
                             <span class="metric-title">Calidad (PSNR)</span>
                             <span class="metric-value" id="metric-psnr">-- dB</span>
-                        </div>
-                        <div class="metric-box">
-                            <span class="metric-title">Compresión Estimada</span>
-                            <span class="metric-value" id="metric-ratio">-- : 1</span>
                         </div>
                     </div>
                 </div>
