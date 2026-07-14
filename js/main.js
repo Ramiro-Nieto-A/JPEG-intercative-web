@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvasBases = document.getElementById('canvas-bases');
     const canvasZigzag = document.getElementById('canvas-zigzag');
     const imageLoader = document.getElementById('image-loader');
+    
     const canvasOriginal = document.getElementById('canvas-original');
+    const emptyState = document.getElementById('empty-state');
 
     // 1. Inicializar Bases Frecuenciales
     if (canvasBases && selectTransform) {
@@ -23,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         animateZigzag(canvasZigzag);
     }
 
-    // 3. Lógica para cargar imagen en el Canvas Original
+    // 3. Cargador de Imágenes robusto
     if (imageLoader && canvasOriginal) {
         const ctx = canvasOriginal.getContext('2d');
         
@@ -35,11 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = (event) => {
                 const img = new Image();
                 img.onload = () => {
-                    // Ajustar el canvas a las dimensiones de la imagen
+                    // Ocultar texto, mostrar canvas
+                    emptyState.style.display = 'none';
+                    canvasOriginal.style.display = 'block';
+
+                    // Asignar tamaño interno real de la imagen
                     canvasOriginal.width = img.width;
                     canvasOriginal.height = img.height;
                     ctx.drawImage(img, 0, 0);
-                    // Actualizar matrices con datos simulados al cargar
+                    
                     updateInteractiveMatrices(selectTransform.value);
                 };
                 img.src = event.target.result;
@@ -47,20 +53,26 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(file);
         });
 
-        // Evento de clic sobre la imagen para inspeccionar bloque
+        // 4. Calcular clic con precisión (mapeando tamaño visual vs interno)
         canvasOriginal.addEventListener('click', (e) => {
-            // Aquí puedes conectar tu lógica real de extracción de bloques.
-            // Por ahora, actualiza las gráficas reactivamente para mostrar interacción.
+            const rect = canvasOriginal.getBoundingClientRect();
+            
+            // Factor de escala (tamaño real / tamaño visual)
+            const scaleX = canvasOriginal.width / rect.width;
+            const scaleY = canvasOriginal.height / rect.height;
+
+            // Coordenadas internas del Canvas
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+
             updateInteractiveMatrices(selectTransform.value);
             
-            // Efecto visual rápido de clic
-            const rect = canvasOriginal.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+            // Efecto de feedback visual (Punto rojo sutil)
+            ctx.fillStyle = 'rgba(255, 59, 48, 0.8)'; // Rojo Apple
             ctx.fillRect(x - 4, y - 4, 8, 8);
+            
             setTimeout(() => {
-                // Redibujar imagen para limpiar el cuadradito rojo
+                // Restaurar borrando el punto
                 const img = new Image();
                 img.onload = () => ctx.drawImage(img, 0, 0);
                 img.src = canvasOriginal.toDataURL();
@@ -68,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Inicializar matrices vacías/mock al inicio
+    // Matrices vacías iniciales
     updateInteractiveMatrices('DCT');
 });
 
@@ -85,10 +97,7 @@ function updateRleTerminal(quantizedBlock) {
     const terminal = document.getElementById('rle-stream-output');
     if (!terminal) return;
 
-    let outputText = `ITBA ASSD - Compresor JPEG\n`;
-    outputText += `Procesando Bloque de 8x8...\n\n`;
-    outputText += `[DC COEFF: ${Math.round(quantizedBlock[0])}]\n`;
-    
+    let outputText = `Procesando Bloque...\n\n[DC: ${Math.round(quantizedBlock[0])}]\n`;
     let zeroCount = 0;
     let acSymbols = [];
 
@@ -102,7 +111,6 @@ function updateRleTerminal(quantizedBlock) {
     }
     
     if (zeroCount > 0) acSymbols.push('[EOB]');
-
-    outputText += acSymbols.length > 0 ? acSymbols.join(' -> ') : '[BLOQUE NULO] -> [EOB]';
+    outputText += acSymbols.length > 0 ? acSymbols.join(' -> ') : '[NULO] -> [EOB]';
     terminal.textContent = outputText;
 }

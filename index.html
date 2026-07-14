@@ -7,78 +7,69 @@
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <header class="main-header">
-        <div class="header-container">
-            <span class="brand">ITBA | <span class="highlight">ASSD</span></span>
-            <span class="subtitle">Laboratorio Interactivo: Transformadas y Compresión JPEG</span>
+    <header class="apple-header">
+        <div class="header-content">
+            <span class="brand">ITBA <span class="light">| ASSD</span></span>
+            <span class="subtitle">Laboratorio de Compresión JPEG</span>
         </div>
     </header>
 
-    <main class="app-content">
+    <main class="app-container">
         <aside class="sidebar">
-            <div class="control-group">
-                <h3>Cargar Imagen</h3>
-                <input type="file" id="image-loader" accept="image/*" class="custom-file-input">
-            </div>
-
-            <div class="control-group">
-                <h3>Transformada</h3>
-                <select id="select-transform" class="custom-select">
+            <div class="control-panel">
+                <h3>Imagen de Entrada</h3>
+                <input type="file" id="image-loader" accept="image/*" class="apple-input">
+                
+                <h3 style="margin-top: 20px;">Transformada</h3>
+                <select id="select-transform" class="apple-select">
                     <option value="DCT">DCT-II Ortonormal</option>
-                    <option value="WHT">Transformada de Hadamard (WHT)</option>
+                    <option value="WHT">Walsh-Hadamard</option>
                 </select>
             </div>
             
-            <div class="control-group info-box">
-                <p><strong>Materia:</strong> Análisis de Señales y Sistemas Digitales</p>
-                <p><strong>Trabajo:</strong> Compresión tipo JPEG</p>
+            <div class="info-widget">
+                <p><strong>Inspección de Bloques</strong></p>
+                <p>Carga una imagen y haz clic sobre ella para analizar un bloque de 8x8 píxeles.</p>
             </div>
         </aside>
 
         <section class="workspace">
-            <article class="card">
+            <div class="card image-card">
                 <h2>Imagen Original</h2>
-                <div class="canvas-container">
-                    <canvas id="canvas-original" width="400" height="400"></canvas>
+                <div class="canvas-wrapper">
+                    <div id="empty-state" class="empty-state">Selecciona una imagen en el panel izquierdo</div>
+                    <canvas id="canvas-original"></canvas>
                 </div>
-                <p class="caption">Haz clic en cualquier parte de la imagen para aislar y analizar un bloque de 8x8 píxeles.</p>
-            </article>
+            </div>
 
-            <article class="card">
+            <div class="card bases-card">
                 <h2>Funciones Base (8x8)</h2>
-                <div class="canvas-container">
-                    <canvas id="canvas-bases" width="400" height="400"></canvas>
+                <div class="canvas-wrapper">
+                    <canvas id="canvas-bases" width="320" height="320"></canvas>
                 </div>
-                <p class="caption">Representación del dominio frecuencial.</p>
-            </article>
+            </div>
 
-            <article class="card">
-                <h2>Análisis Numérico del Bloque Seleccionado</h2>
-                <div class="grid-layout">
-                    <div>
-                        <h3>Dominio Espacial (Luminancia)</h3>
-                        <div id="matrix-spatial" class="matrix-grid"></div>
-                    </div>
-                    <div>
-                        <h3>Dominio Frecuencial (Cuantizado)</h3>
-                        <div id="matrix-frequency" class="matrix-grid"></div>
-                    </div>
-                </div>
-            </article>
+            <div class="card matrix-card">
+                <h2>Dominio Espacial</h2>
+                <div id="matrix-spatial" class="apple-matrix"></div>
+            </div>
 
-            <article class="card">
-                <h2>Codificación Entrópica</h2>
-                <div class="grid-layout">
-                    <div>
-                        <h3>Recorrido Zig-Zag</h3>
-                        <canvas id="canvas-zigzag" width="256" height="256"></canvas>
-                    </div>
-                    <div>
-                        <h3>Flujo de Símbolos (RLE)</h3>
-                        <pre id="rle-stream-output" class="terminal"></pre>
-                    </div>
+            <div class="card matrix-card">
+                <h2>Dominio Frecuencial</h2>
+                <div id="matrix-frequency" class="apple-matrix"></div>
+            </div>
+
+            <div class="card zigzag-card">
+                <h2>Zig-Zag</h2>
+                <div class="canvas-wrapper">
+                    <canvas id="canvas-zigzag" width="200" height="200"></canvas>
                 </div>
-            </article>
+            </div>
+
+            <div class="card rle-card">
+                <h2>Flujo RLE</h2>
+                <pre id="rle-stream-output" class="apple-terminal">Esperando datos...</pre>
+            </div>
         </section>
     </main>
 
