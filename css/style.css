@@ -29,7 +29,7 @@ body {
     display: flex; 
     flex-direction: column; 
     height: 100vh; 
-    overflow: hidden;
+    overflow: hidden; /* Evita scroll en toda la página, solo en el área de trabajo */
 }
 
 /* ==========================================================================
@@ -218,8 +218,9 @@ body {
 }
 
 /* ==========================================================================
-   GRILLAS DE CONTENIDO (LAYOUTS)
+   GRILLAS DE CONTENIDO (LAYOUTS PROTEGIDOS CONTRA DESBORDAMIENTOS)
    ========================================================================== */
+/* El minmax(0, 1fr) es vital: evita que el Grid crezca infinitamente */
 .grid-layout-4 { 
     display: grid; 
     grid-template-columns: repeat(4, minmax(0, 1fr)); 
@@ -285,7 +286,7 @@ body {
 }
 
 /* ==========================================================================
-   CANVAS Y MATRICES
+   CANVAS GENERALES Y MATRICES NUMÉRICAS
    ========================================================================== */
 .canvas-container { 
     display: flex; 
@@ -295,14 +296,14 @@ body {
     padding: 10px; 
     border-radius: 6px; 
     position: relative; 
-    min-height: 150px;
     border: 1px solid var(--border-color);
     overflow: hidden;
 }
 
-/* Lienzos generales */
+/* Lienzos generales limitados a su contenedor */
 #canvas-original, #canvas-y, #canvas-cb, #canvas-cr, #canvas-bases, #canvas-zigzag { 
-    max-width: 100%; 
+    width: 100%; 
+    height: auto;
     max-height: 250px; 
     object-fit: contain;
 }
@@ -318,19 +319,10 @@ body {
     color: var(--text-muted); 
 }
 
-/* Lienzos específicos del submuestreo (Deben ser cuadrados) */
-#cvs-cr-orig, #cvs-cr-dec-noaa, #cvs-cr-dec-aa, #cvs-cr-rec-noaa, #cvs-cr-rec-aa {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    image-rendering: pixelated; 
-    background: #000;
-    object-fit: contain;
-}
-
 /* Rejilla Numérica (Matriz 8x8) */
 .matrix-grid { 
     display: grid; 
-    grid-template-columns: repeat(8, 1fr); 
+    grid-template-columns: repeat(8, minmax(0, 1fr)); 
     gap: 1px; 
     background-color: var(--border-color); 
     border: 1px solid var(--border-color); 
@@ -343,8 +335,7 @@ body {
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    aspect-ratio: 1 / 1;
-    min-height: 30px;
+    aspect-ratio: 1 / 1; /* Forzar cuadrados perfectos */
     font-family: 'Courier New', Courier, monospace; 
     font-size: 11px; 
     cursor: crosshair;
@@ -355,6 +346,27 @@ body {
     filter: brightness(0.85); 
     outline: 2px solid var(--accent-color); 
     z-index: 10;
+}
+
+/* ==========================================================================
+   ZONA DE PELIGRO: LABORATARIO SUBMUESTREO (CANVAS EXACTOS)
+   ========================================================================== */
+/* Esta regla fuerza al contenedor a ser un cuadrado exacto y detiene el desborde vertical */
+.subsampling-analysis .canvas-container {
+    width: 100%;
+    aspect-ratio: 1 / 1; 
+    padding: 0; 
+    display: block; /* Quitamos flex aquí para evitar cálculos erróneos del navegador */
+}
+
+/* El canvas ocupa exactamente la caja cuadrada que lo envuelve, sin estirarse al infinito */
+.subsampling-analysis canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    image-rendering: pixelated; 
+    background: #000;
 }
 
 /* ==========================================================================
@@ -372,19 +384,6 @@ body {
     font-size: 14px; 
     color: #004080; 
     line-height: 1.6; 
-}
-
-.terminal { 
-    background-color: var(--terminal-bg); 
-    color: var(--success-color); 
-    padding: 15px; 
-    border-radius: 6px; 
-    font-family: 'Courier New', Courier, monospace; 
-    height: 230px; 
-    overflow-y: auto; 
-    white-space: pre-wrap; 
-    font-size: 12px; 
-    line-height: 1.5;
 }
 
 .huffman-table-container {
@@ -464,7 +463,7 @@ body {
     background: var(--terminal-bg);
     padding: 10px;
     border-radius: 4px;
-    word-break: break-all;
+    word-break: break-all; /* Obliga al texto binario a saltar de línea */
     white-space: pre-wrap; 
     max-height: 80px;
     overflow-y: auto;
