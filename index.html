@@ -7,69 +7,125 @@
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <header class="apple-header">
-        <div class="header-content">
-            <span class="brand">ITBA <span class="light">| ASSD</span></span>
-            <span class="subtitle">Laboratorio de Compresión JPEG</span>
+    <header class="main-header">
+        <div class="header-container">
+            <span class="brand">ITBA | <span class="highlight">ASSD</span></span>
+            <span class="subtitle">Laboratorio Interactivo: Trabajo Práctico N°4 (Compresión JPEG)</span>
         </div>
     </header>
 
-    <main class="app-container">
+    <main class="app-content">
         <aside class="sidebar">
-            <div class="control-panel">
-                <h3>Imagen de Entrada</h3>
-                <input type="file" id="image-loader" accept="image/*" class="apple-input">
-                
-                <h3 style="margin-top: 20px;">Transformada</h3>
-                <select id="select-transform" class="apple-select">
+            <div class="control-group">
+                <h3>1. Cargar Imagen</h3>
+                <input type="file" id="image-loader" accept="image/*" class="custom-file-input">
+            </div>
+
+            <div class="control-group">
+                <h3>2. Motor de Transformada (Sec. 1)</h3>
+                <select id="select-transform" class="custom-select">
                     <option value="DCT">DCT-II Ortonormal</option>
-                    <option value="WHT">Walsh-Hadamard</option>
+                    <option value="WHT">Transformada de Hadamard (WHT)</option>
                 </select>
             </div>
+
+            <div class="control-group">
+                <h3>3. Factor de Calidad Q (Sec. 4)</h3>
+                <div class="slider-container">
+                    <input type="range" id="slider-q" min="1" max="100" value="50" class="custom-slider">
+                    <span id="q-value" class="slider-value">50</span>
+                </div>
+            </div>
             
-            <div class="info-widget">
-                <p><strong>Inspección de Bloques</strong></p>
-                <p>Carga una imagen y haz clic sobre ella para analizar un bloque de 8x8 píxeles.</p>
+            <div class="control-group info-box">
+                <p><strong>Materia:</strong> Análisis de Señales y Sistemas Digitales</p>
+                <p><strong>Inspección:</strong> Pasa el mouse sobre las celdas de las matrices para ver la explicación teórica.</p>
             </div>
         </aside>
 
         <section class="workspace">
-            <div class="card image-card">
-                <h2>Imagen Original</h2>
-                <div class="canvas-wrapper">
-                    <div id="empty-state" class="empty-state">Selecciona una imagen en el panel izquierdo</div>
-                    <canvas id="canvas-original"></canvas>
+            <div class="card pipeline-card">
+                <h2>Esquema de Compresión Propuesto (Sección 2)</h2>
+                <div class="pipeline-steps">
+                    <div class="step">Preprocesamiento</div>
+                    <div class="arrow">➔</div>
+                    <div class="step">Transformada (DCT)</div>
+                    <div class="arrow">➔</div>
+                    <div class="step">Cuantización</div>
+                    <div class="arrow">➔</div>
+                    <div class="step">Codif. Entrópica</div>
                 </div>
             </div>
 
-            <div class="card bases-card">
-                <h2>Funciones Base (8x8)</h2>
-                <div class="canvas-wrapper">
-                    <canvas id="canvas-bases" width="320" height="320"></canvas>
+            <div class="grid-layout">
+                <article class="card">
+                    <h2>Imagen Original</h2>
+                    <div class="canvas-container">
+                        <div id="empty-state" class="empty-state">Selecciona una imagen</div>
+                        <canvas id="canvas-original"></canvas>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <h2>Funciones Base 8x8 (Sección 1.3)</h2>
+                    <div class="canvas-container">
+                        <canvas id="canvas-bases" width="300" height="300"></canvas>
+                    </div>
+                </article>
+            </div>
+
+            <div class="card inspector-card">
+                <h2>Inspector Analítico</h2>
+                <p id="hover-info" class="hover-text">Pasa el mouse sobre cualquier valor de las matrices de abajo para inspeccionar su significado.</p>
+            </div>
+
+            <div class="card">
+                <h2>Análisis Numérico de Bloque 8x8</h2>
+                <div class="matrices-container">
+                    <div class="matrix-column">
+                        <h3>1. Preprocesamiento (Sec. 3)</h3>
+                        <button id="btn-toggle-shift" class="action-btn">Ver: Corrimiento Nivel [-128, 127]</button>
+                        <div id="matrix-spatial" class="matrix-grid"></div>
+                    </div>
+                    
+                    <div class="matrix-column">
+                        <h3>2. Matriz Cuantizadora (Sec. 4)</h3>
+                        <div class="spacer-text">Tabla estándar escalada por Q</div>
+                        <div id="matrix-quantization" class="matrix-grid"></div>
+                    </div>
+
+                    <div class="matrix-column">
+                        <h3>3. Dominio Frecuencial (Sec. 1.2)</h3>
+                        <div class="spacer-text">Coeficientes post-cuantización</div>
+                        <div id="matrix-frequency" class="matrix-grid"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="card matrix-card">
-                <h2>Dominio Espacial</h2>
-                <div id="matrix-spatial" class="apple-matrix"></div>
-            </div>
-
-            <div class="card matrix-card">
-                <h2>Dominio Frecuencial</h2>
-                <div id="matrix-frequency" class="apple-matrix"></div>
-            </div>
-
-            <div class="card zigzag-card">
-                <h2>Zig-Zag</h2>
-                <div class="canvas-wrapper">
-                    <canvas id="canvas-zigzag" width="200" height="200"></canvas>
+            <article class="card">
+                <h2>Codificación y Reconstrucción</h2>
+                <div class="grid-layout-3">
+                    <div>
+                        <h3>Recorrido Zig-Zag</h3>
+                        <canvas id="canvas-zigzag" width="200" height="200"></canvas>
+                    </div>
+                    <div>
+                        <h3>Flujo de Símbolos (RLE)</h3>
+                        <pre id="rle-stream-output" class="terminal"></pre>
+                    </div>
+                    <div class="metrics-dashboard">
+                        <h3>Métricas de Desempeño</h3>
+                        <div class="metric-box">
+                            <span class="metric-title">PSNR Estimado</span>
+                            <span class="metric-value" id="metric-psnr">-- dB</span>
+                        </div>
+                        <div class="metric-box">
+                            <span class="metric-title">Relación Compresión</span>
+                            <span class="metric-value" id="metric-ratio">-- : 1</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="card rle-card">
-                <h2>Flujo RLE</h2>
-                <pre id="rle-stream-output" class="apple-terminal">Esperando datos...</pre>
-            </div>
+            </article>
         </section>
     </main>
 
