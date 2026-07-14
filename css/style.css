@@ -1,32 +1,167 @@
-/* Dark mode styling for ASSD | ITBA JPEG interactive demo */
 :root {
-  --bg-color: #1e1e1e;
-  --primary: #0066CC; /* Apple-inspired blue but not called Apple */
-  --text-primary: #e5e5e5;
-  --text-secondary: #a0a0a0;
-  --accent: #34C759; /* iOS green for adaptive overlay */
-  --danger: #FF3B30; /* red for high frequency */
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --bg-main: #f0f2f5;
+    --bg-card: #ffffff;
+    --text-main: #333333;
+    --text-muted: #666666;
+    --primary-color: #003366; /* Azul académico / ITBA */
+    --accent-color: #0055a4;
+    --border-color: #dddddd;
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-  margin: 0;
-  font-family: var(--font);
-  background: var(--bg-color);
-  color: var(--text-primary);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
-header.site-header {
-  padding: 2rem 1rem;
-  text-align: center;
-  background: linear-gradient(135deg, #2a2a2a, var(--bg-color));
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+
+/* Header */
+.main-header {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 15px 30px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-h1 { font-size: 2.2rem; margin: 0; }
-.subtitle { font-size: 1rem; color: var(--text-secondary); }
-.panel { margin: 2rem auto; max-width: 960px; padding: 0 1rem; }
-canvas { border: 1px solid #444; border-radius: 4px; max-width: 100%; height: auto; background: #2a2a2a; }
-input[type=range] { width: 200px; }
-button { background: var(--primary); color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 0.5rem; cursor: pointer; transition: background 0.2s; }
-button:hover { background: #0055aa; }
-#metrics-output { font-family: monospace; margin-top: 0.5rem; }
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.highlight {
+    color: #66b2ff;
+}
+
+.subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* Layout */
+.app-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 280px;
+    background-color: var(--bg-card);
+    border-right: 1px solid var(--border-color);
+    padding: 20px;
+}
+
+.workspace {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Cards & Controls */
+.card {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.card h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--bg-main);
+    padding-bottom: 5px;
+}
+
+.control-group {
+    margin-bottom: 20px;
+}
+
+.control-group h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+}
+
+.custom-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.info-box {
+    background-color: var(--bg-main);
+    padding: 15px;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* Grids and Canvas */
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.canvas-container {
+    display: flex;
+    justify-content: center;
+    background: #e0e0e0;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 1px;
+    background-color: var(--border-color);
+    border: 1px solid var(--border-color);
+}
+
+.matrix-grid span {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 35px;
+    font-family: monospace;
+    font-size: 11px;
+}
+
+.terminal {
+    background-color: #1e1e1e;
+    color: #4af626;
+    padding: 15px;
+    border-radius: 4px;
+    font-family: monospace;
+    height: 256px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+.caption {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 10px;
+    text-align: center;
+}

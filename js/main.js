@@ -1,51 +1,68 @@
-﻿import { rgbToYCbCr, yCbCrToRGB } from './modules/colorSpace.js';
+﻿import { drawAllBases } from './modules/frequencyBases.js';
+import { animateZigzag } from './modules/zigzagAnimator.js';
+import { renderMatrixGrid, generateMockBlock } from './modules/heatmapRenderer.js';
 
-const sourceCanvas = document.getElementById('source-canvas');
-const outputCanvas = document.getElementById('output-canvas');
-const ctxSrc = sourceCanvas.getContext('2d');
-const ctxOut = outputCanvas.getContext('2d');
-const sampleSelect = document.getElementById('sample-select');
-const qualityRange = document.getElementById('quality-range');
-const compressBtn = document.getElementById('compress-btn');
-const metricsDiv = document.getElementById('metrics-output');
+document.addEventListener('DOMContentLoaded', () => {
+    const selectTransform = document.getElementById('select-transform');
+    const canvasBases = document.getElementById('canvas-bases');
+    const canvasZigzag = document.getElementById('canvas-zigzag');
+    const terminal = document.getElementById('rle-stream-output');
 
-// Populate sample selector (placeholder list)
-const samples = [
-  // Add sample filenames here (e.g., 'samples/img1.jpg')
-];
-function populateSamples() {
-  samples.forEach((src) => {
-    const opt = document.createElement('option');
-    opt.value = src;
-    opt.textContent = src.split('/').pop();
-    sampleSelect.appendChild(opt);
-  });
-}
-populateSamples();
+    // 1. Inicializar el canvas de bases (DCT por defecto)
+    if (canvasBases && selectTransform) {
+        drawAllBases(canvasBases, selectTransform.value);
+        
+        selectTransform.addEventListener('change', () => {
+            drawAllBases(canvasBases, selectTransform.value);
+            // Al cambiar transformada, actualizamos los datos de prueba numéricos
+            updateInteractiveMatrices(selectTransform.value);
+        });
+    }
 
-function loadImage(src) {
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = () => {
-    ctxSrc.clearRect(0, 0, sourceCanvas.width, sourceCanvas.height);
-    ctxSrc.drawImage(img, 0, 0, sourceCanvas.width, sourceCanvas.height);
-    ctxOut.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
-    ctxOut.drawImage(img, 0, 0, outputCanvas.width, outputCanvas.height);
-  };
-  img.src = src;
-}
+    // 2. Inicializar la animación Zig-Zag
+    if (canvasZigzag) {
+        animateZigzag(canvasZigzag);
+    }
 
-sampleSelect.addEventListener('change', (e) => {
-  const src = e.target.value;
-  if (src) loadImage(src);
+    // 3. Inicializar las matrices numéricas con datos de prueba
+    updateInteractiveMatrices('DCT');
 });
 
-compressBtn.addEventListener('click', () => {
-  // Placeholder: just copy source to output (no compression yet)
-  const imageData = ctxSrc.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
-  // Here you would send imageData to a Web Worker for JPEG pipeline.
-  // For now we just copy.
-  ctxOut.putImageData(imageData, 0, 0);
-  // Update metrics (placeholder)
-  metricsDiv.textContent = Calidad Q= (simulado);
-});
+// Función para simular y renderizar los datos del bloque (Espacial y Frecuencial)
+function updateInteractiveMatrices(transformType) {
+    const spatialData = generateMockBlock('spatial');
+    const frequencyData = generateMockBlock('frequency', transformType);
+
+    renderMatrixGrid('matrix-spatial', spatialData, 'spatial');
+    renderMatrixGrid('matrix-frequency', frequencyData, 'frequency');
+    updateRleTerminal(frequencyData);
+}
+
+// Genera la cadena RLE para la consola
+function updateRleTerminal(quantizedBlock) {
+    const terminal = document.getElementById('rle-stream-output');
+    if (!terminal) return;
+
+    let outputText = `ITBA ASSD - Compresor JPEG\n`;
+    outputText += `Procesando Bloque...\n\n`;
+    outputText += `[DC COEFF: ${Math.round(quantizedBlock[0])}]\n`;
+    
+    let zeroCount = 0;
+    let acSymbols = [];
+
+    for (let i = 1; i < 64; i++) {
+        if (quantizedBlock[i] === 0) {
+            zeroCount++;
+        } else {
+            acSymbols.push(`(${zeroCount}, ${Math.round(quantizedBlock[i])})`);
+            zeroCount = 0;
+        }
+    }
+    
+    if (zeroCount > 0) {
+        acSymbols.push('[EOB]');
+    }
+
+    outputText += acSymbols.length > 0 ? acSymbols.join(' -> ') : '[BLOQUE NULO] -> [EOB]';
+    terminal.textContent = outputText;
+}
