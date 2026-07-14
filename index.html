@@ -10,22 +10,30 @@
     <header class="main-header">
         <div class="header-container">
             <span class="brand">ITBA | <span class="highlight">ASSD</span></span>
-            <span class="subtitle">Laboratorio de Procesamiento de Señales: Pipeline de Compresión JPEG</span>
+            <span class="subtitle">Laboratorio de Procesamiento: Pipeline JPEG Completo</span>
         </div>
     </header>
 
     <main class="app-content">
         <aside class="sidebar">
             <div class="control-group">
-                <h3>Cargar Imagen Original</h3>
+                <h3>Cargar Imagen</h3>
                 <input type="file" id="image-loader" accept="image/*" class="custom-file-input">
             </div>
 
             <div class="control-group">
-                <h3>Motor Matemático</h3>
+                <h3>Submuestreo (Crominancia)</h3>
+                <select id="select-subsampling" class="custom-select">
+                    <option value="444">4:4:4 (Sin submuestreo)</option>
+                    <option value="420">4:2:0 (Decimación y Filtrado)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <h3>Motor de Transformada</h3>
                 <select id="select-transform" class="custom-select">
-                    <option value="DCT">DCT-II Ortonormal (Estándar)</option>
-                    <option value="WHT">Transformada de Hadamard (WHT)</option>
+                    <option value="DCT">DCT-II Ortonormal</option>
+                    <option value="WHT">Walsh-Hadamard</option>
                 </select>
             </div>
 
@@ -36,31 +44,36 @@
                     <span id="q-value" class="slider-value">50</span>
                 </div>
             </div>
+
+            <div class="control-group checkbox-group">
+                <label>
+                    <input type="checkbox" id="check-adaptive">
+                    Activar Cuantización Adaptativa (Varianza espacial)
+                </label>
+            </div>
             
             <div class="control-group info-box">
-                <p><strong>Inspección Interactiva:</strong> Pasa el cursor sobre las celdas de las matrices para visualizar su fundamento teórico, o haz clic en la imagen original para aislar un bloque de 8x8.</p>
+                <p><strong>Clasificación del Bloque:</strong> <span id="block-class-label">Plano</span></p>
+                <p>Haz clic en la imagen original para extraer y procesar un bloque de 8x8 real.</p>
             </div>
         </aside>
 
         <section class="workspace">
-            
             <div class="card pipeline-card">
-                <h2>Flujo de Procesamiento JPEG</h2>
+                <h2>Flujo de Procesamiento JPEG (Basado en Informe Final)</h2>
                 <div class="pipeline-steps">
-                    <div class="step">Espacio de Color</div>
+                    <div class="step">Color y Submuestreo</div>
                     <div class="arrow">➔</div>
-                    <div class="step">División y Corrimiento</div>
-                    <div class="arrow">➔</div>
-                    <div class="step">Transformada 2D</div>
+                    <div class="step">DCT Adaptativa</div>
                     <div class="arrow">➔</div>
                     <div class="step">Cuantización</div>
                     <div class="arrow">➔</div>
-                    <div class="step">Codificación Entrópica</div>
+                    <div class="step">RLE + Huffman</div>
                 </div>
             </div>
 
             <article class="card">
-                <h2>Etapa 1: Imagen Original y Espacio de Color (YCbCr)</h2>
+                <h2>Etapa 1: Espacio de Color y Submuestreo</h2>
                 <div class="grid-layout-4">
                     <div class="channel-box">
                         <h3>RGB Original</h3>
@@ -86,35 +99,32 @@
 
             <div class="grid-layout-bases">
                 <article class="card">
-                    <h2>Etapa 2: Funciones Base 8x8</h2>
+                    <h2>Funciones Base 8x8</h2>
                     <div class="canvas-container">
-                        <canvas id="canvas-bases" width="300" height="300"></canvas>
+                        <canvas id="canvas-bases" width="280" height="280"></canvas>
                     </div>
                 </article>
-
                 <article class="card inspector-card">
-                    <h2>Inspector de Datos</h2>
-                    <p id="hover-info" class="hover-text">Interactúa con el flujo de datos numéricos para comprender la matemática de la compresión.</p>
+                    <h2>Inspector de Datos (Pasa el mouse)</h2>
+                    <p id="hover-info" class="hover-text">Interactúa con las matrices inferiores para ver la explicación teórica de cada coeficiente.</p>
                 </article>
             </div>
 
             <article class="card">
-                <h2>Etapa 3: Procesamiento Numérico de Bloque</h2>
+                <h2>Etapa 2 y 3: Procesamiento del Bloque Seleccionado</h2>
                 <div class="matrices-container">
                     <div class="matrix-column">
-                        <h3>Dominio Espacial</h3>
+                        <h3>1. Dominio Espacial (Píxeles)</h3>
                         <button id="btn-toggle-shift" class="action-btn">Ver: Corrimiento Nivel [-128, 127]</button>
                         <div id="matrix-spatial" class="matrix-grid"></div>
                     </div>
-                    
                     <div class="matrix-column">
-                        <h3>Matriz de Cuantización</h3>
-                        <div class="spacer-text">Ponderación de Sensibilidad Visual</div>
+                        <h3>2. Matriz de Cuantización</h3>
+                        <div class="spacer-text">Ajustada por Q y Filtro Adaptativo</div>
                         <div id="matrix-quantization" class="matrix-grid"></div>
                     </div>
-
                     <div class="matrix-column">
-                        <h3>Dominio Frecuencial</h3>
+                        <h3>3. Dominio Frecuencial</h3>
                         <div class="spacer-text">Coeficientes Cuantizados (Esparsidad)</div>
                         <div id="matrix-frequency" class="matrix-grid"></div>
                     </div>
@@ -122,7 +132,7 @@
             </article>
 
             <article class="card">
-                <h2>Etapa 4 y 5: Codificación Entrópica y Desempeño</h2>
+                <h2>Etapa 4: Codificación Entrópica (Huffman y RLE) y Métricas</h2>
                 <div class="grid-layout-3">
                     <div>
                         <h3>Vectorización Zig-Zag</h3>
@@ -131,11 +141,11 @@
                         </div>
                     </div>
                     <div>
-                        <h3>Símbolos RLE y Huffman</h3>
+                        <h3>Flujo Binario (Huffman Simulado)</h3>
                         <pre id="rle-stream-output" class="terminal"></pre>
                     </div>
                     <div class="metrics-dashboard">
-                        <h3>Evaluación Objetiva</h3>
+                        <h3>Desempeño del Bloque</h3>
                         <div class="metric-box">
                             <span class="metric-title">Error (MSE)</span>
                             <span class="metric-value" id="metric-mse">--</span>
@@ -145,13 +155,12 @@
                             <span class="metric-value" id="metric-psnr">-- dB</span>
                         </div>
                         <div class="metric-box">
-                            <span class="metric-title">Tasa de Compresión</span>
+                            <span class="metric-title">Compresión Estimada</span>
                             <span class="metric-value" id="metric-ratio">-- : 1</span>
                         </div>
                     </div>
                 </div>
             </article>
-
         </section>
     </main>
     <script type="module" src="./js/main.js"></script>
